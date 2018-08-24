@@ -1,0 +1,7 @@
+{
+  "name": "likenutri",
+  "integrations": {
+    "cordova": {}
+  },
+  "type": "ionic-angular"
+}

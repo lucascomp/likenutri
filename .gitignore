@@ -33,3 +33,8 @@ $RECYCLE.BIN/
 .DS_Store
 Thumbs.db
 UserInterfaceState.xcuserstate
+
+likenutri-release-key.jks
+firebase-config.json
+google-services.json
+GoogleService-info.plist

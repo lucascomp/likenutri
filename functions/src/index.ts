@@ -3,12 +3,35 @@ import * as admin from 'firebase-admin';
 
 admin.initializeApp(functions.config().firebase);
 
-const db = admin.firestore();
+exports.feedbackNotificationOnCreate = functions.firestore
+  .document('answers/{answerId}')
+  .onCreate(async event => notificationTrigger(event));
 
-admin.messaging().sendToDevice("token", {
-  notification: {
-    title: 'Teste',
-    body: "teste body",
-    icon: 'https://studiosol-a.akamaihd.net/letras/338x298/fotos/4/8/a/1/48a17902f65d09c3e4ea362b157cdfc9.jpg'
-  }
-});
+exports.feedbackNotificationOnUpdate = functions.firestore
+  .document('answers/{answerId}')
+  .onUpdate(async event => notificationTrigger(event));
+
+async function notificationTrigger(event) {
+  const data = event.data();
+  const db = admin.firestore();
+
+  const userId = data.userId;
+  const answerId = data.answerId;
+
+  const answer = (await db.collection('answers').where('id', '==', answerId).get())[0].data();
+  if (answer.value == 2) return null;
+
+  const question = (await db.collection('questions').where('id', '==', answer.questionId).get())[0].data();
+  const user = (await db.collection('users').where('id', '==', userId).get())[0].data();
+
+  const payload = {
+    notification: {
+      title: 'Dica do dia',
+      body: question.notification
+    }
+  };
+
+  const waitTime = Math.random() * 1000 * 21600 + 1800000;
+
+  return setTimeout(() => admin.messaging().sendToDevice(user.token, payload), waitTime);
+}

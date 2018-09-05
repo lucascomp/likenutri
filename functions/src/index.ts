@@ -3,15 +3,11 @@ import * as admin from 'firebase-admin';
 
 admin.initializeApp(functions.config().firebase);
 
-exports.feedbackNotificationOnCreate = functions.firestore
+exports.feedbackNotification = functions.firestore
   .document('answers/{answerId}')
   .onCreate(async event => notificationTrigger(event));
 
-exports.feedbackNotificationOnUpdate = functions.firestore
-  .document('answers/{answerId}')
-  .onUpdate(async event => notificationTrigger(event));
-
-async function notificationTrigger(event) {
+async function notificationTrigger(event: FirebaseFirestore.DocumentSnapshot) {
   const data = event.data();
   const db = admin.firestore();
 

@@ -11,12 +11,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const functions = require("firebase-functions");
 const admin = require("firebase-admin");
 admin.initializeApp(functions.config().firebase);
-exports.feedbackNotificationOnCreate = functions.firestore
+exports.feedbackNotification = functions.firestore
     .document('answers/{answerId}')
     .onCreate((event) => __awaiter(this, void 0, void 0, function* () { return notificationTrigger(event); }));
-exports.feedbackNotificationOnUpdate = functions.firestore
-    .document('answers/{answerId}')
-    .onUpdate((event) => __awaiter(this, void 0, void 0, function* () { return notificationTrigger(event); }));
 function notificationTrigger(event) {
     return __awaiter(this, void 0, void 0, function* () {
         const data = event.data();

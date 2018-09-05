@@ -8,14 +8,12 @@ exports.feedbackNotification = functions.firestore
   .onCreate(async event => notificationTrigger(event));
 
 async function notificationTrigger(event: FirebaseFirestore.DocumentSnapshot) {
-  const data = event.data();
-  const db = admin.firestore();
-
-  const answer = (await db.doc(`answers/${data.answerId}`).get()).data();
+  const answer = event.data();
   if (answer.value == 2) return null;
 
+  const db = admin.firestore();
   const question = (await db.doc(`questions/${answer.questionId}`).get()).data();
-  const user = (await db.doc(`users/${data.userId}`).get()).data();
+  const user = (await db.doc(`users/${answer.userId}`).get()).data();
 
   const payload = {
     notification: {

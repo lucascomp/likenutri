@@ -11,14 +11,11 @@ async function notificationTrigger(event: FirebaseFirestore.DocumentSnapshot) {
   const data = event.data();
   const db = admin.firestore();
 
-  const userId = data.userId;
-  const answerId = data.answerId;
-
-  const answer = (await db.collection('answers').where('id', '==', answerId).get())[0].data();
+  const answer = (await db.doc(`answers/${data.answerId}`).get()).data();
   if (answer.value == 2) return null;
 
-  const question = (await db.collection('questions').where('id', '==', answer.questionId).get())[0].data();
-  const user = (await db.collection('users').where('id', '==', userId).get())[0].data();
+  const question = (await db.doc(`questions/${answer.questionId}`).get()).data();
+  const user = (await db.doc(`users/${data.userId}`).get()).data();
 
   const payload = {
     notification: {

@@ -13,9 +13,7 @@ exports.deleteUserDoc = functions.auth.user().onDelete(user => deleteUserDoc(use
 exports.feedbackNotification = functions.firestore.document('answers/{answerId}').onCreate(async doc => feedbackNotification(doc));
 
 function createUserDoc(user: admin.auth.UserRecord) {
-  firestore.doc(`users/${user.uid}`).set({
-    uid: user.uid
-  });
+  firestore.doc(`users/${user.uid}`).set({ uid: user.uid });
 }
 
 function deleteUserDoc(user: admin.auth.UserRecord) {

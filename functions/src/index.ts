@@ -3,17 +3,31 @@ import * as admin from 'firebase-admin';
 
 admin.initializeApp(functions.config().firebase);
 
-exports.feedbackNotification = functions.firestore
-  .document('answers/{answerId}')
-  .onCreate(async event => notificationTrigger(event));
+const firestore = admin.firestore();
+firestore.settings({ timestampsInSnapshots: true });
 
-async function notificationTrigger(event: FirebaseFirestore.DocumentSnapshot) {
-  const answer = event.data();
+const messaging = admin.messaging();
+
+exports.createUserDoc = functions.auth.user().onCreate(user => createUserDoc(user));
+exports.deleteUserDoc = functions.auth.user().onDelete(user => deleteUserDoc(user));
+exports.feedbackNotification = functions.firestore.document('answers/{answerId}').onCreate(async doc => feedbackNotification(doc));
+
+function createUserDoc(user: admin.auth.UserRecord) {
+  firestore.doc(`users/${user.uid}`).set({
+    uid: user.uid
+  });
+}
+
+function deleteUserDoc(user: admin.auth.UserRecord) {
+  firestore.collection('users').doc(user.uid).delete();
+}
+
+async function feedbackNotification(doc: FirebaseFirestore.DocumentSnapshot) {
+  const answer = doc.data();
   if (answer.value == 2) return null;
 
-  const db = admin.firestore();
-  const question = (await db.doc(`questions/${answer.questionId}`).get()).data();
-  const user = (await db.doc(`users/${answer.userId}`).get()).data();
+  const question = (await firestore.doc(`questions/${answer.questionId}`).get()).data();
+  const user = (await firestore.doc(`users/${answer.userId}`).get()).data();
 
   const payload = {
     notification: {
@@ -24,5 +38,5 @@ async function notificationTrigger(event: FirebaseFirestore.DocumentSnapshot) {
 
   const waitTime = Math.random() * 1000 * 21600 + 1800000;
 
-  return setTimeout(() => admin.messaging().sendToDevice(user.token, payload), waitTime);
+  return setTimeout(() => messaging.sendToDevice(user.token, payload), waitTime);
 }

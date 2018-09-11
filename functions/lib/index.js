@@ -11,20 +11,27 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const functions = require("firebase-functions");
 const admin = require("firebase-admin");
 admin.initializeApp(functions.config().firebase);
-exports.feedbackNotification = functions.firestore
-    .document('answers/{answerId}')
-    .onCreate((event) => __awaiter(this, void 0, void 0, function* () { return notificationTrigger(event); }));
-function notificationTrigger(event) {
+const firestore = admin.firestore();
+firestore.settings({ timestampsInSnapshots: true });
+const messaging = admin.messaging();
+exports.createUserDoc = functions.auth.user().onCreate(user => createUserDoc(user));
+exports.deleteUserDoc = functions.auth.user().onDelete(user => deleteUserDoc(user));
+exports.feedbackNotification = functions.firestore.document('answers/{answerId}').onCreate((doc) => __awaiter(this, void 0, void 0, function* () { return feedbackNotification(doc); }));
+function createUserDoc(user) {
+    firestore.doc(`users/${user.uid}`).set({
+        uid: user.uid
+    });
+}
+function deleteUserDoc(user) {
+    firestore.collection('users').doc(user.uid).delete();
+}
+function feedbackNotification(doc) {
     return __awaiter(this, void 0, void 0, function* () {
-        const data = event.data();
-        const db = admin.firestore();
-        const userId = data.userId;
-        const answerId = data.answerId;
-        const answer = (yield db.collection('answers').where('id', '==', answerId).get())[0].data();
+        const answer = doc.data();
         if (answer.value == 2)
             return null;
-        const question = (yield db.collection('questions').where('id', '==', answer.questionId).get())[0].data();
-        const user = (yield db.collection('users').where('id', '==', userId).get())[0].data();
+        const question = (yield firestore.doc(`questions/${answer.questionId}`).get()).data();
+        const user = (yield firestore.doc(`users/${answer.userId}`).get()).data();
         const payload = {
             notification: {
                 title: 'Dica do dia',
@@ -32,7 +39,7 @@ function notificationTrigger(event) {
             }
         };
         const waitTime = Math.random() * 1000 * 21600 + 1800000;
-        return setTimeout(() => admin.messaging().sendToDevice(user.token, payload), waitTime);
+        return setTimeout(() => messaging.sendToDevice(user.token, payload), waitTime);
     });
 }
 //# sourceMappingURL=index.js.map

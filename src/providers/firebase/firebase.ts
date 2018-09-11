@@ -1,4 +1,6 @@
 import { Injectable } from '@angular/core';
+import { Firebase } from '@ionic-native/firebase';
+import { Platform } from 'ionic-angular';
 
 import firebase from 'firebase/app';
 import 'firebase/auth';
@@ -8,18 +10,19 @@ import { Subject } from 'rxjs/Subject';
 import 'rxjs/add/operator/first';
 
 declare var require: any;
-const firebaseConfig = require('../../../firebase-config.json');
+firebase.initializeApp(require('../../../firebase-config.json'));
 
 @Injectable()
 export class FirebaseProvider {
 
-  public firestore: firebase.firestore.Firestore;
+  public firestore = firebase.firestore();
 
-  constructor() {}
+  constructor(
+    private messaging: Firebase,
+    private platform: Platform
+  ) { }
 
   initializeApp() {
-    firebase.initializeApp(firebaseConfig);
-    this.firestore = firebase.firestore();
     this.firestore.settings({ timestampsInSnapshots: true });
   }
 
@@ -36,6 +39,13 @@ export class FirebaseProvider {
 
   logout(): Promise<void> {
     return firebase.auth().signOut();
+  }
+
+  async getToken(): Promise<string> {
+    if (this.platform.is('ios')) {
+      await this.messaging.grantPermission();
+    }
+    return this.messaging.getToken();
   }
 
   getUserList() {

@@ -19,6 +19,10 @@ export class MenuPage {
     public loadingCtrl: LoadingController
   ) {}
 
+  ionViewDidLoad() {
+    this.firebaseProvider.getToken();
+  }
+
   logout() {
     this.loadingCtrl.create({ dismissOnPageChange: true }).present();
     this.facebookProvider.logout()

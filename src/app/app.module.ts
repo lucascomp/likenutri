@@ -1,9 +1,10 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { ErrorHandler, NgModule } from '@angular/core';
 import { Facebook } from '@ionic-native/facebook';
-import { Firebase } from '@ionic-native/firebase';
 import { SplashScreen } from '@ionic-native/splash-screen';
 import { StatusBar } from '@ionic-native/status-bar';
+import { Firebase } from '@ionic-native/firebase';
+
 import { IonicApp, IonicErrorHandler, IonicModule } from 'ionic-angular';
 
 import { MyApp } from './app.component';
@@ -25,9 +26,9 @@ import { FirebaseProvider } from '../providers/firebase/firebase';
   ],
   providers: [
     Facebook,
-    Firebase,
     StatusBar,
     SplashScreen,
+    Firebase,
     {provide: ErrorHandler, useClass: IonicErrorHandler},
     FacebookProvider,
     FirebaseProvider,

@@ -1,0 +1,20 @@
+<ion-content padding>
+  <form [formGroup]="form" (ngSubmit)="signup()">
+    <div>
+      <label for="email">E-mail</label>
+      <input name="email" type="email" formControlName="email">
+    </div>
+    <div>
+      <label for="password">Senha</label>
+      <input name="password" type="password" formControlName="password">
+    </div>
+    <div>
+      <label for="confirmPassword">Confirme a senha</label>
+      <input name="confirmPassword" type="password" formControlName="confirmPassword">
+    </div>
+    <div *ngIf="form.errors?.passwordMatch && form.controls.confirmPassword.touched && form.controls.confirmPassword.dirty">
+      As senhas não coincidem
+    </div>
+    <button type="submit" [disabled]="!form.valid">Registrar</button>
+  </form>
+</ion-content>

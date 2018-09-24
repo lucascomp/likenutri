@@ -17,7 +17,7 @@ export class MenuPage {
     public facebookProvider: FacebookProvider,
     public firebaseProvider: FirebaseProvider,
     public loadingCtrl: LoadingController
-  ) {}
+  ) { }
 
   ionViewDidLoad() {
     this.firebaseProvider.getToken();
@@ -25,11 +25,13 @@ export class MenuPage {
 
   logout() {
     this.loadingCtrl.create({ dismissOnPageChange: true }).present();
-    this.facebookProvider.logout()
-      .then(() => {
-        this.firebaseProvider.logout()
-        .then(() => this.navCtrl.setRoot('LoginPage', { showLoginForm: true }));
-      });
+    this.firebaseProvider.logout()
+      .then(() => this.navCtrl.setRoot('LoginPage', { showPage: true }));
+
+  }
+
+  quiz() {
+    this.navCtrl.push('QuizPage', this.navParams.data);
   }
 
 }

@@ -1,5 +1,8 @@
 import { Component } from '@angular/core';
+import { FormControl, FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { IonicPage, NavController, NavParams, LoadingController } from 'ionic-angular';
+
+import { emailValidator } from '../../validators/email.validator';
 
 import { FacebookProvider } from '../../providers/facebook/facebook';
 import { FirebaseProvider } from '../../providers/firebase/firebase';
@@ -11,64 +14,78 @@ import { FirebaseProvider } from '../../providers/firebase/firebase';
 })
 export class LoginPage {
 
-  public showLoginForm: boolean;
+  public showPage: boolean;
+  public form: FormGroup;
 
   constructor(
-    public navCtrl: NavController,
-    public navParams: NavParams,
     public facebookProvider: FacebookProvider,
     public firebaseProvider: FirebaseProvider,
-    public loadingCtrl: LoadingController
+    public formBuilder: FormBuilder,
+    public loadingCtrl: LoadingController,
+    public navCtrl: NavController,
+    public navParams: NavParams,
   ) { }
 
+  ngOnInit() {
+    this.form = this.formBuilder.group({
+      email: new FormControl('', [Validators.required]),
+      password: new FormControl('', [Validators.required, Validators.minLength(6)])
+    }, {
+      validator: emailValidator
+    });
+  }
+
   ionViewDidEnter() {
-    this.showLoginForm = this.navParams.get('showLoginForm');
-    if(this.showLoginForm) return;
+    this.showPage = this.navParams.get('showPage');
+    if (this.showPage) return;
 
     const loading = this.loadingCtrl.create({ dismissOnPageChange: true });
     loading.present();
 
     this.firebaseProvider.onFirstAuthStateChanged(user => {
-      this.facebookProvider.getLoginStatus()
-        .then(response => {
-          if (response.status !== 'connected') {
-            loading.dismiss();
-            this.showLoginForm = true;
-            return;
-          }
-          if (user) {
-            this.goToMenuPage(user);
-            return;
-          }
-          this.firebaseProvider.login(response.authResponse.accessToken)
-            .then(userCredential => {
-              this.goToMenuPage(userCredential.user);
-            })
-            .catch(error => {
-              loading.dismiss();
-              if (error.code === 'auth/network-request-failed') {
-                console.log('falta de conexão'); //TODO: exibir pro usuario
-                return;
-              }
-              console.log('Ocorreu um problema ao se conectar via Facebook. Tente novamente mais tarde.'); //TODO: exibir pro usuario
-            });
-        });
+      if (user) {
+        this.goToMenuPage(user);
+        return;
+      }
+      loading.dismiss();
+      this.showPage = true;
     });
   }
 
-  login() {
+  loginWithEmail() {
     const loading = this.loadingCtrl.create({ dismissOnPageChange: true });
     loading.present();
-    
+
+    this.firebaseProvider.loginWithEmail(this.form.controls.email.value, this.form.controls.password.value)
+      .then(userCredential => {
+        this.goToMenuPage(userCredential.user);
+      })
+      .catch(error => {
+        loading.dismiss();
+        if (error.code === 'auth/network-request-failed') {
+          console.log('falta de conexão'); //TODO: exibir pro usuario
+          return;
+        }
+        else {
+          console.log(error);
+        }
+        console.log('Ocorreu um problema ao se conectar. Tente novamente mais tarde.'); //TODO: exibir pro usuario
+      });
+  }
+
+  loginWithFacebook() {
+    const loading = this.loadingCtrl.create({ dismissOnPageChange: true });
+    loading.present();
+
     this.facebookProvider.login()
       .then(facebookLoginResponse => {
-        this.firebaseProvider.login(facebookLoginResponse.authResponse.accessToken)
+        this.firebaseProvider.loginWithFacebook(facebookLoginResponse.authResponse.accessToken)
           .then(userCredential => {
             this.goToMenuPage(userCredential.user);
           })
           .catch(error => {
             loading.dismiss();
-            if(error.code == 'auth/network-request-failed') {
+            if (error.code == 'auth/network-request-failed') {
               console.log('falta de conexão'); //TODO: exibir pro usuario
               return;
             }
@@ -82,6 +99,10 @@ export class LoginPage {
           return;
         }
       });
+  }
+
+  signup() {
+    this.navCtrl.push('RegisterPage');
   }
 
   goToMenuPage(user: firebase.User) {

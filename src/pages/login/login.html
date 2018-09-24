@@ -1,3 +1,21 @@
-<ion-content *ngIf="showLoginForm" padding>
-  <button ion-button block (tap)="login()">Entrar com Facebook</button>
+<ion-content *ngIf="showPage" padding>
+  <form [formGroup]="form" (ngSubmit)="loginWithEmail()">
+    <div>
+      <label for="email">E-mail</label>
+      <input name="email" type="email" formControlName="email">
+    </div>
+    <div>
+      <label for="password">Senha</label>
+      <input name="password" type="password" formControlName="password">
+    </div>
+    <button type="submit" [disabled]="!form.valid">Entrar</button>
+  </form>
+  <div>
+    <span>ou</span>
+  </div>
+  <button (tap)="loginWithFacebook()">Entrar com Facebook</button>
+  <div>
+    <span>ou</span>
+  </div>
+  <button (tap)="signup()">Cadastre-se</button>
 </ion-content>

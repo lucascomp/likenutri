@@ -35,7 +35,7 @@ export class LoginPage {
     });
   }
 
-  ionViewDidEnter() {
+  ionViewDidLoad() {
     this.showPage = this.navParams.get('showPage');
     if (this.showPage) return;
 

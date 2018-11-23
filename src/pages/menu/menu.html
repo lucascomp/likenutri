@@ -1,4 +1,52 @@
+<ion-header>
+  <img src="assets/imgs/likenutri.png">
+</ion-header>
 <ion-content padding>
-  <button (tap)="logout()">Logout</button>
-  <button (tap)="quiz()">Quiz</button>
+  <div>
+    <img class="photo" [src]="user?.photoURL || 'assets/imgs/user.png'">
+  </div>
+  <div>
+    <span class="line title">Meu Perfil</span>
+  </div>
+  <div>
+    <span class="line profile-score">Pontuação: 3,5</span>
+  </div>
+  <div class="menu">
+    <div class="item">
+      <div class="icon" (tap)="lookForNutri()">
+        <img src="assets/imgs/heart-health.png">
+      </div>
+      <span class="description" (tap)="lookForNutri()">Procuro um Nutri?</span>
+    </div>
+    <div class="item" (tap)="quiz()">
+      <div class="icon">
+        <img src="assets/imgs/question.png">
+      </div>
+      <span class="description">Quiz</span>
+    </div>
+    <div class="item">
+      <div class="icon">
+        <img src="assets/imgs/prize.png">
+      </div>
+      <span class="description">Emblemas</span>
+    </div>
+    <div class="item" (tap)="ranking()">
+      <div class="icon">
+        <img src="assets/imgs/leaderboard.png">
+      </div>
+      <span class="description">Ranking</span>
+    </div>
+    <div class="item" (tap)="feedback()">
+      <div class="icon">
+        <img src="assets/imgs/comments.png">
+      </div>
+      <span class="description">Dúvidas e Sugestões</span>
+    </div>
+    <div class="item" (tap)="logout()">
+      <div class="icon">
+        <img src="assets/imgs/logout.png">
+      </div>
+      <span class="description">Sair</span>
+    </div>
+  </div>
 </ion-content>

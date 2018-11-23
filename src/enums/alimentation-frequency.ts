@@ -1,5 +1,4 @@
 export enum AlimentationFrequency {
-
   DotnEat,
   DontEatAllDays,
   OneToTwo,
@@ -8,5 +7,4 @@ export enum AlimentationFrequency {
   FourToFive,
   FiveOrMore,
   AllDays
-
 }

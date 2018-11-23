@@ -1,20 +1,34 @@
+<ion-header>
+  <img src="assets/imgs/likenutri.png">
+</ion-header>
 <ion-content padding>
   <form [formGroup]="form" (ngSubmit)="signup()">
-    <div>
-      <label for="email">E-mail</label>
-      <input name="email" type="email" formControlName="email">
-    </div>
-    <div>
-      <label for="password">Senha</label>
-      <input name="password" type="password" formControlName="password">
-    </div>
-    <div>
-      <label for="confirmPassword">Confirme a senha</label>
-      <input name="confirmPassword" type="password" formControlName="confirmPassword">
-    </div>
-    <div *ngIf="form.errors?.passwordMatch && form.controls.confirmPassword.touched && form.controls.confirmPassword.dirty">
+    <ion-item>
+      <ion-label floating>E-mail</ion-label>
+      <ion-input name="email" type="email" formControlName="email"></ion-input>
+    </ion-item>
+    <ion-item>
+      <ion-label floating>Senha</ion-label>
+      <ion-input name="password" type="password" formControlName="password"></ion-input>
+    </ion-item>
+    <ion-item>
+      <ion-label floating>Confirme a senha</ion-label>
+      <ion-input name="confirmPassword" type="password" formControlName="confirmPassword"></ion-input>
+    </ion-item>
+    <span class="error-msg" *ngIf="form.controls.email.touched && form.controls.email.dirty && form.errors?.emailInvalid">
+      Insira um e-mail válido
+    </span>
+    <span class="error-msg" *ngIf="form.controls.email.valid && form.controls.password.touched && form.controls.password.dirty && form.controls.password.invalid">
+      É necessário que a senha tenha no mínimo 6 caracteres
+    </span>
+    <span class="error-msg" *ngIf="form.controls.password.valid && form.controls.confirmPassword.touched && form.controls.confirmPassword.dirty && form.errors?.passwordMatch">
       As senhas não coincidem
+    </span>
+    <div class="div-btn">
+      <button ion-button round outline color="secondary" type="submit" [disabled]="!form.valid">Registrar</button>
     </div>
-    <button type="submit" [disabled]="!form.valid">Registrar</button>
   </form>
+  <div class="div-btn">
+    <button ion-button round outline color="secondary" (tap)="navCtrl.pop()">Voltar</button>
+  </div>
 </ion-content>

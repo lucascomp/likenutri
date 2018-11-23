@@ -20,7 +20,7 @@ export class MyApp {
     platform.ready().then(() => {
       statusBar.backgroundColorByName('black');
       statusBar.styleBlackTranslucent();
-      firebaseProvider.initializeApp();
+      firebaseProvider.initializeApp(); 
       splashScreen.hide();
     });
   }

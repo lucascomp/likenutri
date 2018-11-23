@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Firebase } from '@ionic-native/firebase';
-import { Platform } from 'ionic-angular';
+import { Platform, DateTime } from 'ionic-angular';
 
 import firebase from 'firebase/app';
 import 'firebase/auth';
@@ -9,12 +9,12 @@ import 'firebase/firestore';
 import { Subject } from 'rxjs/Subject';
 import 'rxjs/add/operator/first';
 
+import { Profile } from '../../models/profile';
 import { Question } from '../../models/question';
 import { Answer } from '../../models/answer';
 
 declare var require: any;
 firebase.initializeApp(require('../../../firebase-config.json'));
-
 @Injectable()
 export class FirebaseProvider {
 
@@ -58,6 +58,37 @@ export class FirebaseProvider {
       await this.messaging.grantPermission();
     }
     return this.messaging.getToken();
+  }
+
+  getUserData(userId: string): Promise<firebase.firestore.DocumentData> {
+    return new Promise<firebase.firestore.DocumentData>((resolve, reject) => {
+      this.firestore.doc(`users/${userId}`).get({ source: 'server' })
+        .then(documentSnapshot => {
+          resolve(documentSnapshot.data());
+        })
+        .catch(reject);
+    });
+  }
+
+  updateProfile(userId: string, data: firebase.firestore.DocumentData): Promise<void> {
+    return new Promise<void>((resolve, reject) => {
+      this.firestore.doc(`users/${userId}`).update(data)
+        .then(resolve)
+        .catch(reject);
+    });
+  }
+
+  sendFeedback(userId: string, message: string): Promise<void> {
+    return new Promise<void>((resolve, reject) => {
+      let data: firebase.firestore.DocumentData = {
+        uid: userId,
+        message,
+        timestamp: new Date().toISOString()
+      };
+      this.firestore.collection('feedback').add(data)
+        .then(() => resolve())
+        .catch(reject);
+    });
   }
 
   // getQuestion(userId: number): Promise<Question> {

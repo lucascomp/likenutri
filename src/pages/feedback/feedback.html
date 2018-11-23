@@ -1,0 +1,12 @@
+<ion-header>
+  <img src="assets/imgs/likenutri.png">
+</ion-header>
+<ion-content padding>
+  <div class="box">
+    <div>Dúvidas e Sugestões</div>
+    <textarea [(ngModel)]="message" class="msg" maxlength="400"></textarea>
+  </div>
+  <div class="div-btn">
+    <button ion-button round outline color="secondary" (tap)="send()">Enviar</button>
+  </div>
+</ion-content>

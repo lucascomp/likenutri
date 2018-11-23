@@ -1,0 +1,49 @@
+<ion-header>
+  <img src="assets/imgs/likenutri.png">
+</ion-header>
+<ion-content padding>
+  <h6 class="title">Complete seu cadastro</h6>
+  <form [formGroup]="form" (ngSubmit)="createProfile()">
+    <ion-item>
+      <ion-label floating>Nome</ion-label>
+      <ion-input name="name" formControlName="name"></ion-input>
+    </ion-item>
+    <ion-item>
+      <ion-label color="secondary" floating>Sexo</ion-label>
+      <ion-select name="gender" formControlName="gender">
+        <ion-option value="female">Feminino</ion-option>
+        <ion-option value="male">Masculino</ion-option>
+      </ion-select>
+    </ion-item>
+    <ion-item>
+      <ion-label floating>Nascimento</ion-label>
+      <ion-datetime name="birthday" displayFormat="DD/MM/YYYY" formControlName="birthday"></ion-datetime>
+    </ion-item>
+    <ion-item>
+      <ion-label floating>Peso</ion-label>
+      <ion-input name="weight" type="number" formControlName="weight"></ion-input>
+    </ion-item>
+    <ion-item>
+      <ion-label floating>Altura</ion-label>
+      <ion-input name="height" type="number" formControlName="height"></ion-input>
+    </ion-item>
+    <span class="error-msg" *ngIf="form.controls.name.touched && form.controls.name.dirty && form.controls.name.invalid">
+      Informe seu nome
+    </span>
+    <span class="error-msg" *ngIf="form.controls.name.valid && form.controls.gender.touched && form.controls.gender.invalid">
+      Selecione seu sexo
+    </span>
+    <span class="error-msg" *ngIf="form.controls.gender.valid && form.controls.birthday.touched && form.controls.birthday.invalid">
+      Informe sua data de nascimento
+    </span>
+    <span class="error-msg" *ngIf="form.controls.birthday.valid && form.controls.weight.touched && form.controls.weight.dirty && form.controls.weight.invalid">
+      Informe seu peso
+    </span>
+    <span class="error-msg" *ngIf="form.controls.weight.valid && form.controls.height.touched && form.controls.height.dirty && form.controls.height.invalid">
+      Informe sua altura
+    </span>
+    <div class="div-btn">
+      <button ion-button round outline color="secondary" type="submit" [disabled]="!form.valid">Continuar</button>
+    </div>
+  </form>
+</ion-content>

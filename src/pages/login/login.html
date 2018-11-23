@@ -1,21 +1,30 @@
-<ion-content *ngIf="showPage" padding>
+<ion-header>
+  <img src="assets/imgs/likenutri.png">
+</ion-header>
+<ion-content padding>
+  <div class="div-btn">
+    <button class="facebook"(tap)="loginWithFacebook()">Entrar com o Facebook</button>
+  </div>
   <form [formGroup]="form" (ngSubmit)="loginWithEmail()">
-    <div>
-      <label for="email">E-mail</label>
-      <input name="email" type="email" formControlName="email">
+    <ion-item>
+      <ion-label floating>E-mail</ion-label>
+      <ion-input name="email" type="email" formControlName="email"></ion-input>
+    </ion-item>
+    <ion-item>
+      <ion-label floating>Senha</ion-label>
+      <ion-input name="password" type="password" formControlName="password"></ion-input>
+    </ion-item>
+    <span class="error-msg" *ngIf="form.controls.email.touched && form.controls.email.dirty && form.errors?.emailInvalid">
+      Insira um e-mail válido
+    </span>
+    <span class="error-msg" *ngIf="form.controls.password.touched && form.controls.password.dirty && form.controls.password.invalid">
+      Insira sua senha
+    </span>
+    <div class="div-btn">
+      <button ion-button round outline color="secondary" type="submit" [disabled]="!form.valid">Entrar</button>
     </div>
-    <div>
-      <label for="password">Senha</label>
-      <input name="password" type="password" formControlName="password">
-    </div>
-    <button type="submit" [disabled]="!form.valid">Entrar</button>
   </form>
-  <div>
-    <span>ou</span>
+  <div class="div-btn">
+    <button ion-button round outline color="secondary" (tap)="signup()">Cadastre-se</button>
   </div>
-  <button (tap)="loginWithFacebook()">Entrar com Facebook</button>
-  <div>
-    <span>ou</span>
-  </div>
-  <button (tap)="signup()">Cadastre-se</button>
 </ion-content>

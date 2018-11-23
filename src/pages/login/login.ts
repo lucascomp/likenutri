@@ -1,11 +1,13 @@
 import { Component } from '@angular/core';
 import { FormControl, FormGroup, FormBuilder, Validators } from '@angular/forms';
-import { IonicPage, NavController, NavParams, LoadingController } from 'ionic-angular';
+import { IonicPage, NavController, NavParams, LoadingController, ToastController } from 'ionic-angular';
 
 import { emailValidator } from '../../validators/email.validator';
 
 import { FacebookProvider } from '../../providers/facebook/facebook';
 import { FirebaseProvider } from '../../providers/firebase/firebase';
+
+import { Profile } from '../../models/profile';
 
 @IonicPage()
 @Component({
@@ -14,7 +16,6 @@ import { FirebaseProvider } from '../../providers/firebase/firebase';
 })
 export class LoginPage {
 
-  public showPage: boolean;
   public form: FormGroup;
 
   constructor(
@@ -24,32 +25,33 @@ export class LoginPage {
     public loadingCtrl: LoadingController,
     public navCtrl: NavController,
     public navParams: NavParams,
+    public toastCtrl: ToastController,
   ) { }
 
   ngOnInit() {
     this.form = this.formBuilder.group({
       email: new FormControl('', [Validators.required]),
-      password: new FormControl('', [Validators.required, Validators.minLength(6)])
+      password: new FormControl('', [Validators.required])
     }, {
       validator: emailValidator
     });
   }
 
-  ionViewDidEnter() {
-    this.showPage = this.navParams.get('showPage');
-    if (this.showPage) return;
-
+  ionViewDidLoad() {
     const loading = this.loadingCtrl.create({ dismissOnPageChange: true });
     loading.present();
 
     this.firebaseProvider.onFirstAuthStateChanged(user => {
       if (user) {
-        this.goToMenuPage(user);
+        this.nextPage(user);
         return;
       }
       loading.dismiss();
-      this.showPage = true;
     });
+  }
+
+  ionViewDidEnter() {
+    this.form.reset();
   }
 
   loginWithEmail() {
@@ -58,18 +60,18 @@ export class LoginPage {
 
     this.firebaseProvider.loginWithEmail(this.form.controls.email.value, this.form.controls.password.value)
       .then(userCredential => {
-        this.goToMenuPage(userCredential.user);
+        this.nextPage(userCredential.user);
       })
       .catch(error => {
         loading.dismiss();
         if (error.code === 'auth/network-request-failed') {
-          console.log('falta de conexão'); //TODO: exibir pro usuario
+          this.showToast('Ocorreu uma falha na conexão');
           return;
         }
-        else {
-          console.log(error);
+        if (error.code === 'auth/wrong-password') {
+          this.showToast('E-mail ou senha incorretos');
         }
-        console.log('Ocorreu um problema ao se conectar. Tente novamente mais tarde.'); //TODO: exibir pro usuario
+        this.showToast(`Ops! Ocorreu um erro inesperado: ${error.code}`);
       });
   }
 
@@ -81,23 +83,24 @@ export class LoginPage {
       .then(facebookLoginResponse => {
         this.firebaseProvider.loginWithFacebook(facebookLoginResponse.authResponse.accessToken)
           .then(userCredential => {
-            this.goToMenuPage(userCredential.user);
+            this.nextPage(userCredential.user);
           })
           .catch(error => {
             loading.dismiss();
             if (error.code == 'auth/network-request-failed') {
-              console.log('falta de conexão'); //TODO: exibir pro usuario
+              this.showToast('Ocorreu uma falha na conexão');
               return;
             }
-            console.log('erro de conexão com firebase'); //TODO: exibir pro usuario
+            this.showToast(`Ops! Ocorreu um erro inesperado: ${error.code}`);
           });
       })
       .catch(error => {
         loading.dismiss();
         if (error.errorCode != 4201) {
-          console.log('falta de conexão'); //TODO: exibir pro usuario
+          this.showToast('Ocorreu uma falha na conexão');
           return;
         }
+        this.showToast(`Ops! Ocorreu um erro inesperado: ${error.errorCode}`);
       });
   }
 
@@ -105,7 +108,31 @@ export class LoginPage {
     this.navCtrl.push('RegisterPage');
   }
 
-  goToMenuPage(user: firebase.User) {
-    this.navCtrl.setRoot('MenuPage', { user: user });
+  async nextPage(user: firebase.User) {
+    this.firebaseProvider.getUserData(user.uid)
+      .then(data => {
+        let profile = new Profile();
+        profile.data = data;
+        if (profile.isComplete) {
+          this.navCtrl.setRoot('MenuPage', { user, profile });
+          return;
+        }
+        this.navCtrl.setRoot('ProfileCreatePage', { user, profile });
+      })
+      .catch(error => {
+        if (error.code === 'unavailable') {
+          this.showToast('Ocorreu uma falha na conexão');
+          return;
+        }
+        this.showToast(`Ops! Ocorreu um erro inesperado: ${error.code}`);
+      });
+  }
+
+  showToast(msg: string) {
+    this.toastCtrl.create({
+      message: msg,
+      duration: 5000,
+      position: 'bottom'
+    }).present();
   }
 }

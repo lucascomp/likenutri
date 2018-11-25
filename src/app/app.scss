@@ -41,6 +41,7 @@
 
 .title {
   margin-top: 20px;
+  margin-bottom: 10px;
   font-size: 120%;
   font-weight: 400;
 }
@@ -67,7 +68,9 @@
     height: 60px;
     align-items: center;
     .icon {
-      text-align: center;
+      display: flex;
+      justify-content: center;
+      align-items: center;
       width: 20%;
     }
     .description {
@@ -77,7 +80,8 @@
     .score {
       width: 20%;
       position: absolute;
-      right: 0;
+      text-align: right;
+      right: 15px;
     }
   }
 }

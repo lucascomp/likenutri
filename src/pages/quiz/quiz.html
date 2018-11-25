@@ -2,37 +2,41 @@
   <img src="assets/imgs/likenutri.png">
 </ion-header>
 <ion-content padding>
-  <div>
+  <div *ngIf="questions.length">
     <span class="title">Quiz</span>
   </div>
-  <div class="question">Ao escolher o que beber, qual é a opção mais frequente?</div>
-  <div class="options">
-    <div class="item">
+  <div *ngIf="questions.length" class="question">{{questions[0].data().question}}</div>
+  <div *ngIf="questions.length" class="options">
+    <div class="item" (tap)="selected = 0">
       <div class="div-check">
-        <ion-checkbox></ion-checkbox>
+        <ion-checkbox [checked]="selected == 0" disabled="true"></ion-checkbox>
       </div>
-      <span>Água ou suco natural de fruta sem açucar aaaaaaaaaaaaaaaaaaaaaaaaaaaa mt frande praca rahllho rsrsrsr sraijsouifhaj  faef0e</span>
+      <span>{{questions[0].data().options[0].description}}</span>
     </div>
-    <div class="item">
+    <div class="item" (tap)="selected = 1">
       <div class="div-check">
-        <ion-checkbox></ion-checkbox>
+        <ion-checkbox [checked]="selected == 1" disabled="true"></ion-checkbox>
       </div>
-      <span>Suco natural da fruta com açúcar</span>
+      <span>{{questions[0].data().options[1].description}}</span>
     </div>
-    <div class="item">
+    <div class="item" (tap)="selected = 2">
       <div class="div-check">
-        <ion-checkbox></ion-checkbox>
+        <ion-checkbox [checked]="selected == 2" disabled="true"></ion-checkbox>
       </div>
-      <span>Refresco em pó, guaraná natural ou refrigerante</span>
+      <span>{{questions[0].data().options[2].description}}</span>
     </div>
   </div>
-  <div class="div-btn">
-    <button ion-button round outline color="secondary" (tap)="confirm()">Confirmar</button>
+  <div *ngIf="questions.length" class="div-btn">
+    <button ion-button round outline color="secondary" (tap)="confirm()" [disabled]="selected == null">Confirmar</button>
   </div>
 </ion-content>
-<div class="modal">
-  <div class="content">
-    <div class="title">Pontuação: 1</div>
-    <div class="text">Evite a adição de açucar, o consumo excessivo de sucos adoçados pode contribuir com a ingestão aumentada de calorias na alimentação e vários lorem ipsum dolor sit a met por favor por que devido ao fato do teste e tal, tá ligado? Mec nec o philps na parada po, ta maluco respeita a moça que amanhã é nóis</div>
+<div *ngIf="showFeedback" class="modal">
+  <div class="content entering" [class.leaving]="leaving">
+    <div class="title">Pontuação: {{questions[0].data().options[selected].value}}</div>
+    <div class="text">{{questions[0].data().options[selected].feedback}}</div>
+    <div class="btns">
+      <button ion-button round outline (tap)="menu()">Menu</button>
+      <button ion-button round outline (tap)="next()">Próximo</button>
+    </div>
   </div>
 </div>

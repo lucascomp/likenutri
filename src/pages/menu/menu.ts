@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { IonicPage, NavController, NavParams, LoadingController } from 'ionic-angular';
+import { IonicPage, NavController, NavParams, LoadingController, ToastController } from 'ionic-angular';
 
 import { FacebookProvider } from '../../providers/facebook/facebook';
 import { FirebaseProvider } from '../../providers/firebase/firebase';
@@ -22,7 +22,8 @@ export class MenuPage {
     public navParams: NavParams,
     public facebookProvider: FacebookProvider,
     public firebaseProvider: FirebaseProvider,
-    public loadingCtrl: LoadingController
+    public loadingCtrl: LoadingController,
+    public toastCtrl: ToastController
   ) { }
 
   ionViewDidLoad() {
@@ -36,7 +37,7 @@ export class MenuPage {
 
     let promises: Promise<any>[] = [this.firebaseProvider.logout()];
 
-    if (this.user.providerData[0].providerId == LoginProvider.Facebook) {
+    if (this.isUserFromFacebook()) {
       promises.push(this.facebookProvider.logout());
     }
     
@@ -44,7 +45,7 @@ export class MenuPage {
   }
 
   quiz() {
-    this.navCtrl.push('QuizPage', this.navParams.data);
+    this.navCtrl.push('QuizPage', { user: this.user, profile: this.profile });
   }
 
   lookForNutri() {
@@ -52,11 +53,22 @@ export class MenuPage {
   }
 
   ranking() {
-    this.navCtrl.push('RankingPage');
+    this.navCtrl.push('RankingPage', { user: this.user, profile: this.profile });
   }
 
   feedback() {
     this.navCtrl.push('FeedbackPage', { user: this.user });
   }
 
+  isUserFromFacebook() {
+    return this.user.providerData[0].providerId == LoginProvider.Facebook;
+  }
+
+  showToast(msg: string) {
+    this.toastCtrl.create({
+      message: msg,
+      duration: 5000,
+      position: 'bottom'
+    }).present();
+  }
 }

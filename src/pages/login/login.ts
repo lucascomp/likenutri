@@ -7,8 +7,6 @@ import { emailValidator } from '../../validators/email.validator';
 import { FacebookProvider } from '../../providers/facebook/facebook';
 import { FirebaseProvider } from '../../providers/firebase/firebase';
 
-import { Profile } from '../../models/profile';
-
 @IonicPage()
 @Component({
   selector: 'page-login',
@@ -17,6 +15,7 @@ import { Profile } from '../../models/profile';
 export class LoginPage {
 
   public form: FormGroup;
+  public showForm: boolean;
 
   constructor(
     public facebookProvider: FacebookProvider,
@@ -38,15 +37,16 @@ export class LoginPage {
   }
 
   ionViewDidLoad() {
-    const loading = this.loadingCtrl.create({ dismissOnPageChange: true });
+    const loading = this.loadingCtrl.create();
     loading.present();
 
     this.firebaseProvider.onFirstAuthStateChanged(user => {
+      loading.dismiss();
       if (user) {
         this.nextPage(user);
         return;
       }
-      loading.dismiss();
+      this.showForm = true;
     });
   }
 
@@ -55,11 +55,12 @@ export class LoginPage {
   }
 
   loginWithEmail() {
-    const loading = this.loadingCtrl.create({ dismissOnPageChange: true });
+    const loading = this.loadingCtrl.create();
     loading.present();
 
     this.firebaseProvider.loginWithEmail(this.form.controls.email.value, this.form.controls.password.value)
       .then(userCredential => {
+        loading.dismiss();
         this.nextPage(userCredential.user);
       })
       .catch(error => {
@@ -76,13 +77,14 @@ export class LoginPage {
   }
 
   loginWithFacebook() {
-    const loading = this.loadingCtrl.create({ dismissOnPageChange: true });
+    const loading = this.loadingCtrl.create();
     loading.present();
 
     this.facebookProvider.login()
       .then(facebookLoginResponse => {
         this.firebaseProvider.loginWithFacebook(facebookLoginResponse.authResponse.accessToken)
           .then(userCredential => {
+            loading.dismiss();
             this.nextPage(userCredential.user);
           })
           .catch(error => {
@@ -109,23 +111,7 @@ export class LoginPage {
   }
 
   async nextPage(user: firebase.User) {
-    this.firebaseProvider.getUserData(user.uid)
-      .then(data => {
-        let profile = new Profile();
-        profile.data = data;
-        if (profile.isComplete) {
-          this.navCtrl.setRoot('MenuPage', { user, profile });
-          return;
-        }
-        this.navCtrl.setRoot('ProfileCreatePage', { user, profile });
-      })
-      .catch(error => {
-        if (error.code === 'unavailable') {
-          this.showToast('Ocorreu uma falha na conexão');
-          return;
-        }
-        this.showToast(`Ops! Ocorreu um erro inesperado: ${error.code}`);
-      });
+    this.navCtrl.setRoot('ProfileCreatePage', { user });
   }
 
   showToast(msg: string) {

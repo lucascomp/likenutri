@@ -2,11 +2,11 @@
   <img src="assets/imgs/likenutri.png">
 </ion-header>
 <ion-content padding>
-  <h6 class="title">Complete seu cadastro</h6>
-  <form [formGroup]="form" (ngSubmit)="createProfile()">
+  <h6 *ngIf="showForm" class="title">Complete seu cadastro</h6>
+  <form *ngIf="showForm" [formGroup]="form" (ngSubmit)="createProfile()">
     <ion-item>
       <ion-label floating>Nome</ion-label>
-      <ion-input name="name" formControlName="name"></ion-input>
+      <ion-input name="name" formControlName="name" maxlength="50"></ion-input>
     </ion-item>
     <ion-item>
       <ion-label color="secondary" floating>Sexo</ion-label>
@@ -21,11 +21,11 @@
     </ion-item>
     <ion-item>
       <ion-label floating>Peso</ion-label>
-      <ion-input name="weight" type="number" formControlName="weight"></ion-input>
+      <ion-input name="weight" type="number" formControlName="weight" maxlength="4"></ion-input>
     </ion-item>
     <ion-item>
       <ion-label floating>Altura</ion-label>
-      <ion-input name="height" type="number" formControlName="height"></ion-input>
+      <ion-input name="height" type="number" formControlName="height" maxlength="4"></ion-input>
     </ion-item>
     <span class="error-msg" *ngIf="form.controls.name.touched && form.controls.name.dirty && form.controls.name.invalid">
       Informe seu nome

@@ -25,19 +25,7 @@ export class FacebookProvider {
   }
 
   getUserFriends(): Promise<any> {
-    return new Promise((resolve, reject) => {
-      this.facebook.api('me/friends', [])
-        .then(resolve)
-        .catch(error => {
-          console.log('error', error);
-          if (error.errorCode === '190') { //TODO: devolver reject e tratar este erro em quem está chamando o método
-            console.log('Já está deslogado do facebook. Enviar usuário para tela de login');
-          }
-          else if(error.errorCode === '2500') {
-            console.log('É necessário realizar o login pelo facebook');
-          }
-        });
-    });
+    return this.facebook.api('me/friends', []);
   }
 
 }

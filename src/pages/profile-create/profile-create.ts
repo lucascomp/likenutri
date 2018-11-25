@@ -18,7 +18,7 @@ export class ProfileCreatePage {
 
   public form: FormGroup;
   public user: firebase.User;
-  public profile: Profile;
+  public showForm: boolean;
 
   constructor(
     public facebookProvider: FacebookProvider,
@@ -42,35 +42,56 @@ export class ProfileCreatePage {
 
   ionViewDidLoad() {
     this.user = this.navParams.get('user');
-    this.profile = this.navParams.get('profile');
 
     const loading = this.loadingCtrl.create();
+    loading.present();
 
-    if (this.user.providerData[0].providerId == LoginProvider.Facebook) {
-      loading.present();
-      this.facebookProvider.getUserData()
-        .then(data => {
+    this.firebaseProvider.getUserData(this.user.uid)
+      .then(data => {
+        let profile = new Profile();
+        profile.data = data;
+        if (data && profile.isComplete) {
           loading.dismiss();
-          this.form.controls.name.setValue(data.name);
-          this.form.controls.gender.setValue(data.gender);
-          let dateIso8601 = data.birthday.substr(-4) + '-' + data.birthday.substr(0, 2) + '-' + data.birthday.substring(3, 5);
-          this.form.controls.birthday.setValue(dateIso8601);
-        })
-        .catch(error => {
-          loading.dismiss();
-          if (error.errorCode === '190' || error.errorCode === '2500') {
-            this.firebaseProvider.logout()
-              .then(() => {
-                this.navCtrl.pop();
-              });
-          }
+          this.navCtrl.setRoot('MenuPage', { user: this.user, profile });
+          return;
+        }
+
+        this.showForm = true;
+        if (this.user.providerData[0].providerId == LoginProvider.Facebook) {
+          this.facebookProvider.getUserData()
+            .then(data => {
+              loading.dismiss();
+              this.form.controls.name.setValue(data.name);
+              this.form.controls.gender.setValue(data.gender);
+              let dateIso8601 = data.birthday.substr(-4) + '-' + data.birthday.substr(0, 2) + '-' + data.birthday.substring(3, 5);
+              this.form.controls.birthday.setValue(dateIso8601);
+            })
+            .catch(error => {
+              loading.dismiss();
+              if (error.errorCode === '190' || error.errorCode === '2500') {
+                this.firebaseProvider.logout()
+                  .then(() =>  this.navCtrl.setRoot('LoginPage'));
+              }
+              this.showToast('Ocorreu uma falha na conexão');
+            });
+        }
+      })
+      .catch(error => {
+        loading.dismiss();
+        if (error.code === 'permission-denied') {
+          this.navCtrl.setRoot('LoginPage');
+          return;
+        }
+        if (error.code === 'unavailable') {
           this.showToast('Ocorreu uma falha na conexão');
-        });
-    }
+          return;
+        }
+        this.showToast(`Ops! Ocorreu um erro inesperado: ${error}`);
+      });
   }
 
   async createProfile() {
-    const loading = this.loadingCtrl.create({ dismissOnPageChange: true });
+    const loading = this.loadingCtrl.create();
     loading.present();
 
     let data: firebase.firestore.DocumentData = {
@@ -78,22 +99,25 @@ export class ProfileCreatePage {
       gender: this.form.controls.gender.value,
       birthday: this.form.controls.birthday.value,
       weight: this.form.controls.weight.value,
-      height: this.form.controls.height.value
+      height: this.form.controls.height.value,
+      uid: this.user.providerData[0].uid,
+      score: 0
     };
 
-    this.firebaseProvider.updateProfile(this.user.uid, data)
+    this.firebaseProvider.createProfile(this.user.uid, data)
       .then(() => {
+        loading.dismiss();
         let profile: Profile = new Profile();
         profile.data = data;
         
         this.navCtrl.setRoot('MenuPage', { user: this.user, profile });
       })
       .catch(error => {
+        loading.dismiss();
         if (error.code === 'permission-denied') {
           this.navCtrl.setRoot('LoginPage');
           return;
         }
-        loading.dismiss();
         if (error.code === 'unavailable') {
           this.showToast('Ocorreu uma falha na conexão');
           return;

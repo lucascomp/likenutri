@@ -18,7 +18,7 @@ export class FeedbackPage {
     public navParams: NavParams,
     public firebaseProvider: FirebaseProvider,
     public loadingCtrl: LoadingController,
-    public toastCtrl: ToastController,
+    public toastCtrl: ToastController
   ) { }
 
   ionViewDidLoad() {
@@ -31,7 +31,7 @@ export class FeedbackPage {
 
     this.firebaseProvider.sendFeedback(this.user.uid, this.message)
       .then(() => {
-        this.showToast("Sua mensagem foi enviada com sucesso. Agradecemos a sua contribuição!");
+        this.showToast("Sua mensagem foi enviada com sucesso. Agradecemos a contribuição!");
         this.navCtrl.pop();
       })
       .catch(error => {

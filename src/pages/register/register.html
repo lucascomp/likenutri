@@ -5,15 +5,15 @@
   <form [formGroup]="form" (ngSubmit)="signup()">
     <ion-item>
       <ion-label floating>E-mail</ion-label>
-      <ion-input name="email" type="email" formControlName="email"></ion-input>
+      <ion-input name="email" type="email" formControlName="email" maxlength="50"></ion-input>
     </ion-item>
     <ion-item>
       <ion-label floating>Senha</ion-label>
-      <ion-input name="password" type="password" formControlName="password"></ion-input>
+      <ion-input name="password" type="password" formControlName="password" maxlength="20"></ion-input>
     </ion-item>
     <ion-item>
       <ion-label floating>Confirme a senha</ion-label>
-      <ion-input name="confirmPassword" type="password" formControlName="confirmPassword"></ion-input>
+      <ion-input name="confirmPassword" type="password" formControlName="confirmPassword" maxlength="20"></ion-input>
     </ion-item>
     <span class="error-msg" *ngIf="form.controls.email.touched && form.controls.email.dirty && form.errors?.emailInvalid">
       Insira um e-mail válido

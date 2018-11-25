@@ -7,6 +7,6 @@
     <textarea [(ngModel)]="message" class="msg" maxlength="400"></textarea>
   </div>
   <div class="div-btn">
-    <button ion-button round outline color="secondary" (tap)="send()">Enviar</button>
+    <button ion-button round outline color="secondary" (tap)="send()" [disabled]="message?.length < 20">Enviar</button>
   </div>
 </ion-content>

@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Firebase } from '@ionic-native/firebase';
-import { Platform, DateTime } from 'ionic-angular';
+import { Platform } from 'ionic-angular';
 
 import firebase from 'firebase/app';
 import 'firebase/auth';
@@ -8,10 +8,6 @@ import 'firebase/firestore';
 
 import { Subject } from 'rxjs/Subject';
 import 'rxjs/add/operator/first';
-
-import { Profile } from '../../models/profile';
-import { Question } from '../../models/question';
-import { Answer } from '../../models/answer';
 
 declare var require: any;
 firebase.initializeApp(require('../../../firebase-config.json'));
@@ -70,9 +66,9 @@ export class FirebaseProvider {
     });
   }
 
-  updateProfile(userId: string, data: firebase.firestore.DocumentData): Promise<void> {
+  createProfile(userId: string, data: firebase.firestore.DocumentData): Promise<void> {
     return new Promise<void>((resolve, reject) => {
-      this.firestore.doc(`users/${userId}`).update(data)
+      this.firestore.doc(`users/${userId}`).set(data)
         .then(resolve)
         .catch(reject);
     });
@@ -91,41 +87,48 @@ export class FirebaseProvider {
     });
   }
 
-  // getQuestion(userId: number): Promise<Question> {
-  //   return new Promise<Question>((resolve, reject) => {
-  //     this.firestore.collection('answers').where('userId', '==', userId).get({ source: 'server' })
-  //       .then(querySnapshot => {
-  //         const answers: Answer[] = [];
-  //         querySnapshot.forEach(doc => {
-  //           answers.push(doc.data() as Answer);
-  //         });
+  getFriendsScore(list: {id: string, name: string, score: string}[]): Promise<any> {
+    return new Promise<any>((resolve, reject) => {
+      let collection = this.firestore.collection('users');
+      let query: firebase.firestore.Query;
+      list.forEach(user => {
+        query = (query ? query : collection).where('uid', '==', user.id);
+      });
+      query.get({ source: 'server' })
+        .then(querySnapshot => {
+          querySnapshot.docs.forEach(doc => {
+            list.find(user => user.id == doc.data().uid).score = doc.data().score;
+          });
+          resolve();
+        })
+        .catch(reject);
+    });
+  }
 
-          
-  //       })
-  //       .catch(error => {
-  //         if (error.code === 'unavailable') {
-  //           console.log('falta de conexão');
-  //         }
-  //         else if (error.code === 'permission-denied') {
-  //           console.log('Usuário deslogado do firebase');
-  //         }
-  //       });
-  //   });
-  // }
+  getQuestions(uid: string): Promise<firebase.firestore.QueryDocumentSnapshot[]> {
+    return new Promise<firebase.firestore.QueryDocumentSnapshot[]>((resolve, reject) => {
+      this.firestore.collection('answers').where('userId', '==', uid).get({ source: 'server' })
+        .then(querySnapshot => {
+          let count = querySnapshot.size;
+          this.firestore.collection('questions').get({ source: 'server' })
+            .then(querySnapshot => {
+              resolve(querySnapshot.docs.slice(count));
+            });
+        })
+        .catch(reject);
+    });
+  }
 
-  // getUserList() {
-  //   this.firestore.collection('users').get({ source: 'server' }) //TODO: definir tipo da lista de retorno
-  //     .then(querySnapshot => {
-  //       console.log(querySnapshot.docs);
-  //     })
-  //     .catch(error => {
-  //       if (error.code === 'unavailable') {
-  //         console.log('falta de conexão');
-  //       }
-  //       else if (error.code === 'permission-denied') {
-  //         console.log('Usuário deslogado do firebase');
-  //       }
-  //     });
-  // }
-
+  setAnswer(userId: string, questionId: string, value: number): Promise<void> {
+    return new Promise<void>((resolve, reject) => {
+      let data: firebase.firestore.DocumentData = {
+        userId,
+        questionId,
+        value
+      };
+      this.firestore.collection('answers').add(data)
+        .then(() => resolve())
+        .catch(reject);
+    });
+  }
 }

@@ -2,17 +2,17 @@
   <img src="assets/imgs/likenutri.png">
 </ion-header>
 <ion-content padding>
-  <div class="div-btn">
+  <div *ngIf="showForm" class="div-btn">
     <button class="facebook"(tap)="loginWithFacebook()">Entrar com o Facebook</button>
   </div>
-  <form [formGroup]="form" (ngSubmit)="loginWithEmail()">
+  <form *ngIf="showForm" [formGroup]="form" (ngSubmit)="loginWithEmail()">
     <ion-item>
       <ion-label floating>E-mail</ion-label>
-      <ion-input name="email" type="email" formControlName="email"></ion-input>
+      <ion-input name="email" type="email" formControlName="email" maxlength="50"></ion-input>
     </ion-item>
     <ion-item>
       <ion-label floating>Senha</ion-label>
-      <ion-input name="password" type="password" formControlName="password"></ion-input>
+      <ion-input name="password" type="password" formControlName="password" maxlength="20"></ion-input>
     </ion-item>
     <span class="error-msg" *ngIf="form.controls.email.touched && form.controls.email.dirty && form.errors?.emailInvalid">
       Insira um e-mail válido
@@ -24,7 +24,7 @@
       <button ion-button round outline color="secondary" type="submit" [disabled]="!form.valid">Entrar</button>
     </div>
   </form>
-  <div class="div-btn">
+  <div *ngIf="showForm" class="div-btn">
     <button ion-button round outline color="secondary" (tap)="signup()">Cadastre-se</button>
   </div>
 </ion-content>

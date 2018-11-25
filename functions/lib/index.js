@@ -14,24 +14,21 @@ admin.initializeApp(functions.config().firebase);
 const firestore = admin.firestore();
 firestore.settings({ timestampsInSnapshots: true });
 const messaging = admin.messaging();
-exports.createUserDoc = functions.auth.user().onCreate(user => createUserDoc(user));
 exports.deleteUserDoc = functions.auth.user().onDelete(user => deleteUserDoc(user));
 exports.feedbackNotification = functions.firestore.document('answers/{answerId}').onCreate((doc) => __awaiter(this, void 0, void 0, function* () { return feedbackNotification(doc); }));
-function createUserDoc(user) {
-    firestore.doc(`users/${user.uid}`).set({
-        uid: user.uid
-    });
-}
 function deleteUserDoc(user) {
-    firestore.collection('users').doc(user.uid).delete();
+    return firestore.collection('users').doc(user.uid).delete();
 }
 function feedbackNotification(doc) {
     return __awaiter(this, void 0, void 0, function* () {
         const answer = doc.data();
+        const user = (yield firestore.doc(`users/${answer.userId}`).get()).data();
+        firestore.doc(`users/${answer.userId}`).update({
+            score: user.score + answer.value
+        });
         if (answer.value == 2)
             return null;
         const question = (yield firestore.doc(`questions/${answer.questionId}`).get()).data();
-        const user = (yield firestore.doc(`users/${answer.userId}`).get()).data();
         const payload = {
             notification: {
                 title: 'Dica do dia',

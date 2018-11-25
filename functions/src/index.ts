@@ -8,24 +8,24 @@ firestore.settings({ timestampsInSnapshots: true });
 
 const messaging = admin.messaging();
 
-exports.createUserDoc = functions.auth.user().onCreate(user => createUserDoc(user));
 exports.deleteUserDoc = functions.auth.user().onDelete(user => deleteUserDoc(user));
 exports.feedbackNotification = functions.firestore.document('answers/{answerId}').onCreate(async doc => feedbackNotification(doc));
 
-function createUserDoc(user: admin.auth.UserRecord) {
-  firestore.doc(`users/${user.uid}`).set({ uid: user.uid });
-}
-
 function deleteUserDoc(user: admin.auth.UserRecord) {
-  firestore.collection('users').doc(user.uid).delete();
+  return firestore.collection('users').doc(user.uid).delete();
 }
 
 async function feedbackNotification(doc: FirebaseFirestore.DocumentSnapshot) {
   const answer = doc.data();
-  if (answer.value == 2) return null;
 
-  const question = (await firestore.doc(`questions/${answer.questionId}`).get()).data();
   const user = (await firestore.doc(`users/${answer.userId}`).get()).data();
+  firestore.doc(`users/${answer.userId}`).update({
+    score: user.score + answer.value
+  });
+  
+  if (answer.value == 2) return null;
+  
+  const question = (await firestore.doc(`questions/${answer.questionId}`).get()).data();
 
   const payload = {
     notification: {

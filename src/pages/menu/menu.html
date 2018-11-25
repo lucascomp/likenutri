@@ -9,7 +9,7 @@
     <span class="line title">Meu Perfil</span>
   </div>
   <div>
-    <span class="line profile-score">Pontuação: 3,5</span>
+    <span class="line profile-score">Pontuação: {{profile?.data.score}}</span>
   </div>
   <div class="menu">
     <div class="item">
@@ -24,13 +24,13 @@
       </div>
       <span class="description">Quiz</span>
     </div>
-    <div class="item">
+    <!-- <div class="item">
       <div class="icon">
         <img src="assets/imgs/prize.png">
       </div>
       <span class="description">Emblemas</span>
-    </div>
-    <div class="item" (tap)="ranking()">
+    </div> -->
+    <div *ngIf="user && isUserFromFacebook()" class="item" (tap)="ranking()">
       <div class="icon">
         <img src="assets/imgs/leaderboard.png">
       </div>

@@ -32,6 +32,9 @@ page-quiz {
               border-left-width: 0;
             }
           }
+          .checkbox-disabled {
+            opacity: 1 !important;
+          }
         }
         span {
           width: 88%;
@@ -49,7 +52,7 @@ page-quiz {
     align-items: flex-end;
     height: 100%;
     width: 100%;
-    background: rgba(0, 0, 0, .5);
+    background: rgba(0, 0, 0, .4);
     z-index: 10;
     .content {
       background: rgba(255, 255, 255, .9);
@@ -61,8 +64,28 @@ page-quiz {
       }
       .text {
         color: black;
-        padding: 10px 15px 20px 15px;
+        padding: 20px 15px 20px 15px;
+      }
+      .btns {
+        padding-bottom: 10px;
       }
     }
+    .entering {
+      animation: bounce-in 0.5s;
+      animation-direction: alternate;
+    }
+    .leaving {
+      animation: bounce-out 0.5s;
+      animation-direction: alternate;
+    }
   }
+}
+
+@keyframes bounce-in {
+  from { transform: translate3d(0, 200px, 0);     }
+  to   { transform: translate3d(0, 0px, 0); }
+}
+@keyframes bounce-out {
+  from { transform: translate3d(0, 0px, 0);     }
+  to   { transform: translate3d(0, 200px, 0); }
 }

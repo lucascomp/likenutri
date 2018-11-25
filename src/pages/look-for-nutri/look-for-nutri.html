@@ -3,8 +3,8 @@
 </ion-header>
 <ion-content padding>
   <div class="title">Procuro um Nutri?</div>
-  <div class="box">Procure um nutricionista para orientação quanto a ajustes necessários na alimentação para prevenção e tratamento de doenças e adoção de uma alimentação saudável.</div>
-  <div class="box">Mantenha uma alimentação saudável, condição essencial para promoção da saúde e prevenção de doenças.</div>
+  <div *ngIf="profile && lookForNutri" class="box">Procure um nutricionista para orientação quanto a ajustes necessários na alimentação para prevenção e tratamento de doenças e adoção de uma alimentação saudável.</div>
+  <div *ngIf="profile && !lookForNutri" class="box">Mantenha uma alimentação saudável, condição essencial para promoção da saúde e prevenção de doenças.</div>
   <div class="div-btn">
     <button ion-button round outline color="secondary" (tap)="navCtrl.pop()">Voltar</button>
   </div>
